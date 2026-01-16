@@ -1,0 +1,15 @@
+{
+  "name": "sebelasindonesia",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build:api": "npm --workspace apps/api run build",
+    "build:web": "npm --workspace apps/web run build",
+    "build:admin": "npm --workspace apps/admin run build",
+    "start:web": "npm --workspace apps/web run start",
+    "start:admin": "npm --workspace apps/admin run start"
+  }
+}

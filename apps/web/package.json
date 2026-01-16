@@ -1,0 +1,8 @@
+{
+  "name": "@sebelas/web",
+  "private": true,
+  "scripts": {
+    "build": "echo \"TODO: build web\"",
+    "start": "echo \"TODO: start web\""
+  }
+}

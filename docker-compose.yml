@@ -1,0 +1,99 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: sebelas-nginx
+    depends_on:
+      - api
+      - web
+      - admin
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./infra/nginx/certs:/etc/nginx/certs:ro
+    networks:
+      - sebelas
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: sebelas-api
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sebelas
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: sebelas-worker
+    env_file:
+      - ./.env
+    command: ["node", "dist/worker.js"]
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sebelas
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: sebelas-web
+    env_file:
+      - ./.env
+    depends_on:
+      - api
+    networks:
+      - sebelas
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    container_name: sebelas-admin
+    env_file:
+      - ./.env
+    depends_on:
+      - api
+    networks:
+      - sebelas
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: sebelas-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sebelas
+
+  redis:
+    image: redis:7-alpine
+    container_name: sebelas-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - sebelas
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  sebelas:
+    driver: bridge
