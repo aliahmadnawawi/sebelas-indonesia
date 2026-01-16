@@ -62,6 +62,24 @@ async function main() {
     },
   });
 
+  const defaultTenant = await prisma.tenant.upsert({
+    where: { id: "default-tenant" },
+    update: {},
+    create: { id: "default-tenant", name: "Default Tenant", status: "ACTIVE" },
+  });
+
+  const defaultStore = await prisma.store.upsert({
+    where: { slug: "sebelas" },
+    update: {},
+    create: {
+      name: "Sebelas Default Store",
+      slug: "sebelas",
+      tenantId: defaultTenant.id,
+      timezone: "Asia/Jakarta",
+      currency: "IDR",
+    },
+  });
+
   const category = await prisma.category.create({
     data: {
       name: "Beverages",
@@ -106,7 +124,20 @@ async function main() {
     create: { code: "mock", isEnabled: true },
   });
 
-  console.log("Seed complete", { superTenant, demoUser, store });
+  await prisma.storePaymentProvider.upsert({
+    where: { id: "default-mock-provider" },
+    update: {},
+    create: {
+      id: "default-mock-provider",
+      tenantId: defaultTenant.id,
+      storeId: defaultStore.id,
+      providerCode: "mock",
+      isEnabled: true,
+      config: {},
+    },
+  });
+
+  console.log("Seed complete", { superTenant, demoUser, store, defaultStore });
 }
 
 main()

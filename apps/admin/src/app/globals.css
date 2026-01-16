@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-ash text-noir font-body dark:bg-[#121212] dark:text-[#f4f4f8];
+}

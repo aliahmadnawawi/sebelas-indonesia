@@ -87,6 +87,19 @@ export class StoreService {
     });
   }
 
+  async updateTelegramBot(
+    tenantId: string,
+    storeId: string,
+    botId: string,
+    status?: string
+  ) {
+    await this.getById(tenantId, storeId);
+    return this.prisma.storeChannelTelegram.update({
+      where: { id: botId },
+      data: { status },
+    });
+  }
+
   async addWhatsAppChannel(
     tenantId: string,
     storeId: string,
@@ -98,6 +111,7 @@ export class StoreService {
         tenantId,
         storeId,
         phoneNumberId: dto.phoneNumberId,
+        wabaId: dto.wabaId,
         accessToken: dto.accessToken,
         webhookVerifyToken: dto.webhookVerifyToken,
       },
@@ -107,6 +121,19 @@ export class StoreService {
   async listWhatsAppChannels(tenantId: string, storeId: string) {
     return this.prisma.storeChannelWhatsApp.findMany({
       where: { tenantId, storeId },
+    });
+  }
+
+  async updateWhatsAppChannel(
+    tenantId: string,
+    storeId: string,
+    channelId: string,
+    status?: string
+  ) {
+    await this.getById(tenantId, storeId);
+    return this.prisma.storeChannelWhatsApp.update({
+      where: { id: channelId },
+      data: { status },
     });
   }
 }

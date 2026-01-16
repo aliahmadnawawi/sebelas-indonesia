@@ -6,6 +6,7 @@ export interface PaymentProvider {
     amount: number;
     currency: string;
     paymentMethod?: string;
+    config?: Record<string, any> | null;
   }): Promise<{ invoiceId: string; paymentUrl?: string; raw?: unknown }>;
   verifyWebhook(payload: any, headers: Record<string, string>): boolean;
   getWebhookEventId(payload: any): string;

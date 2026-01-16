@@ -18,6 +18,31 @@ export class CartService {
     });
   }
 
+  async getOrCreateChannelCart(
+    tenantId: string,
+    storeId: string,
+    channel: "WEB" | "TELEGRAM" | "WHATSAPP",
+    channelUserId: string
+  ) {
+    const existing = await this.prisma.cart.findFirst({
+      where: {
+        tenantId,
+        storeId,
+        channel,
+        channelUserId,
+        status: "ACTIVE",
+      },
+      include: { items: true },
+    });
+    if (existing) {
+      return existing;
+    }
+    return this.prisma.cart.create({
+      data: { tenantId, storeId, channel, channelUserId },
+      include: { items: true },
+    });
+  }
+
   async addItem(
     tenantId: string,
     storeId: string,
@@ -63,6 +88,17 @@ export class CartService {
       throw new NotFoundException("Cart item not found");
     }
     return this.prisma.cartItem.delete({ where: { id: cartItemId } });
+  }
+
+  async getCart(tenantId: string, storeId: string, cartId: string) {
+    const cart = await this.prisma.cart.findFirst({
+      where: { id: cartId, tenantId, storeId },
+      include: { items: { include: { product: true } } },
+    });
+    if (!cart) {
+      throw new NotFoundException("Cart not found");
+    }
+    return cart;
   }
 
   async checkout(

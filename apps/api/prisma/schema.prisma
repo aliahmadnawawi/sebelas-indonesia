@@ -107,7 +107,7 @@ model StoreChannelTelegram {
   id         String   @id @default(uuid())
   tenantId   String
   storeId    String
-  botToken   String
+  botToken   String   @unique
   botUsername String?
   status     String   @default("ACTIVE")
   createdAt  DateTime @default(now())
@@ -118,7 +118,8 @@ model StoreChannelWhatsApp {
   id              String   @id @default(uuid())
   tenantId        String
   storeId         String
-  phoneNumberId   String
+  phoneNumberId   String   @unique
+  wabaId          String
   accessToken     String
   webhookVerifyToken String
   status          String   @default("ACTIVE")
@@ -188,6 +189,7 @@ model Cart {
   tenantId  String
   storeId   String
   channel   ChannelType
+  channelUserId String?
   status    CartStatus @default(ACTIVE)
   createdAt DateTime   @default(now())
   store     Store      @relation(fields: [storeId], references: [id])
@@ -248,6 +250,18 @@ model PaymentProvider {
   code      String   @unique
   isEnabled Boolean  @default(true)
   config    Json?
+}
+
+model StorePaymentProvider {
+  id        String   @id @default(uuid())
+  tenantId  String
+  storeId   String
+  providerCode String
+  isEnabled Boolean  @default(true)
+  config    Json?
+  store     Store    @relation(fields: [storeId], references: [id])
+
+  @@unique([tenantId, storeId, providerCode])
 }
 
 model WebhookEvent {

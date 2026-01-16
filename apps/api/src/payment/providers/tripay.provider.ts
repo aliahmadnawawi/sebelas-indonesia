@@ -15,6 +15,7 @@ export class TripayProvider implements PaymentProvider {
     amount: number;
     currency: string;
     paymentMethod?: string;
+    config?: Record<string, any> | null;
   }) {
     const method = (payload.paymentMethod || "QRIS").toUpperCase();
     return {

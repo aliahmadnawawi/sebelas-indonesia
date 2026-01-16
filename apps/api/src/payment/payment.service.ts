@@ -7,6 +7,7 @@ import { TripayProvider } from "./providers/tripay.provider";
 import { PakasirProvider } from "./providers/pakasir.provider";
 import { SaweriaProvider } from "./providers/saweria.provider";
 import { createPaymentQueue } from "./payment.queue";
+import { UpdateStoreProviderDto } from "./dto/update-store-provider.dto";
 
 @Injectable()
 export class PaymentService {
@@ -36,6 +37,40 @@ export class PaymentService {
     return dbProviders;
   }
 
+  async getStoreProviders(tenantId: string, storeId: string) {
+    return this.prisma.storePaymentProvider.findMany({
+      where: { tenantId, storeId },
+    });
+  }
+
+  async upsertStoreProvider(
+    tenantId: string,
+    storeId: string,
+    providerCode: string,
+    dto: UpdateStoreProviderDto
+  ) {
+    return this.prisma.storePaymentProvider.upsert({
+      where: {
+        tenantId_storeId_providerCode: {
+          tenantId,
+          storeId,
+          providerCode,
+        },
+      },
+      update: {
+        isEnabled: dto.isEnabled,
+        config: dto.config,
+      },
+      create: {
+        tenantId,
+        storeId,
+        providerCode,
+        isEnabled: dto.isEnabled ?? true,
+        config: dto.config ?? {},
+      },
+    });
+  }
+
   async createInvoice(
     tenantId: string,
     orderId: string,
@@ -60,11 +95,18 @@ export class PaymentService {
     if (!order) {
       throw new NotFoundException("Order not found");
     }
+    const storeProvider = await this.prisma.storePaymentProvider.findFirst({
+      where: { tenantId, storeId: order.storeId, providerCode: selectedCode },
+    });
+    if (storeProvider && !storeProvider.isEnabled) {
+      throw new BadRequestException("Payment provider disabled for store");
+    }
     const invoice = await provider.createInvoice({
       orderId: order.id,
       amount: order.totalAmount,
       currency: order.currency,
       paymentMethod,
+      config: storeProvider?.config,
     });
     const payment = await this.prisma.payment.create({
       data: {

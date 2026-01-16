@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class CheckoutDto {
   @IsNotEmpty()
@@ -7,5 +7,6 @@ export class CheckoutDto {
   @IsNotEmpty()
   paymentProvider: string;
 
+  @IsOptional()
   paymentMethod?: string;
 }

@@ -15,6 +15,7 @@ export class MockPaymentProvider implements PaymentProvider {
     amount: number;
     currency: string;
     paymentMethod?: string;
+    config?: Record<string, any> | null;
   }) {
     const method = payload.paymentMethod || "MOCK";
     return {

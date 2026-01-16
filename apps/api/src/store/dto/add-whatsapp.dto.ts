@@ -5,6 +5,9 @@ export class AddWhatsAppDto {
   phoneNumberId: string;
 
   @IsNotEmpty()
+  wabaId: string;
+
+  @IsNotEmpty()
   accessToken: string;
 
   @IsNotEmpty()

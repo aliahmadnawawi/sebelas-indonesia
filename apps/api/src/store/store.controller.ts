@@ -17,6 +17,7 @@ import { UpdateStoreDto } from "./dto/update-store.dto";
 import { AddTelegramDto } from "./dto/add-telegram.dto";
 import { AddWhatsAppDto } from "./dto/add-whatsapp.dto";
 import { Public } from "../common/decorators/public.decorator";
+import { UpdateChannelDto } from "./dto/update-channel.dto";
 
 @ApiTags("stores")
 @Controller("stores")
@@ -71,6 +72,16 @@ export class StoreController {
     return this.storeService.listTelegramBots(req.tenantId, id);
   }
 
+  @Patch(":id/telegram-bots/:botId")
+  updateTelegram(
+    @Req() req: any,
+    @Param("id") id: string,
+    @Param("botId") botId: string,
+    @Body() dto: UpdateChannelDto
+  ) {
+    return this.storeService.updateTelegramBot(req.tenantId, id, botId, dto.status);
+  }
+
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, TenantGuard)
   @Post(":id/whatsapp-channels")
@@ -87,5 +98,20 @@ export class StoreController {
   @Get(":id/whatsapp-channels")
   listWhatsApp(@Req() req: any, @Param("id") id: string) {
     return this.storeService.listWhatsAppChannels(req.tenantId, id);
+  }
+
+  @Patch(":id/whatsapp-channels/:channelId")
+  updateWhatsApp(
+    @Req() req: any,
+    @Param("id") id: string,
+    @Param("channelId") channelId: string,
+    @Body() dto: UpdateChannelDto
+  ) {
+    return this.storeService.updateWhatsAppChannel(
+      req.tenantId,
+      id,
+      channelId,
+      dto.status
+    );
   }
 }

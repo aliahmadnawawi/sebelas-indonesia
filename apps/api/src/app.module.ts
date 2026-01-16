@@ -14,6 +14,10 @@ import { CartModule } from "./cart/cart.module";
 import { OrderModule } from "./order/order.module";
 import { PaymentModule } from "./payment/payment.module";
 import { HealthModule } from "./health/health.module";
+import { StorefrontModule } from "./storefront/storefront.module";
+import { TelegramModule } from "./telegram/telegram.module";
+import { WhatsAppModule } from "./whatsapp/whatsapp.module";
+import { AdminModule } from "./admin/admin.module";
 
 @Module({
   imports: [
@@ -28,6 +32,8 @@ import { HealthModule } from "./health/health.module";
         JWT_ACCESS_TTL: Joi.string().default("15m"),
         JWT_REFRESH_TTL: Joi.string().default("30d"),
         PAYMENT_PROVIDER_DEFAULT: Joi.string().default("mock"),
+        TELEGRAM_WEBHOOK_SECRET: Joi.string().allow(""),
+        SUPERADMIN_TENANT_ID: Joi.string().default("super-tenant"),
       }),
     }),
     ThrottlerModule.forRoot([
@@ -46,6 +52,10 @@ import { HealthModule } from "./health/health.module";
     OrderModule,
     PaymentModule,
     HealthModule,
+    StorefrontModule,
+    TelegramModule,
+    WhatsAppModule,
+    AdminModule,
   ],
   providers: [
     {
